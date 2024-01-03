@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <title>RSA中p**r*q的三种情形 // </title>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <meta charset="utf-8" />
+    <meta name="generator" content="Hugo 0.92.2" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="author" content="John Doe" />
+    <meta name="description" content="" />
+    <link rel="stylesheet" href="/css/main.min.5b1fcc8902588589c4767187402a3c29f8b8d7a6fdef6d9f8f77045bb0d14fee.css" />
+    
+
+    
+    <meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="RSA中p**r*q的三种情形"/>
+<meta name="twitter:description" content="[TOC] 文献地址：
+
+文献： First Attack 适用场景：$ex-\phi(n)y=z$，$gcd(e,phi)=1$
+先small_root求出x,然后求公约数得到g，根据g处理出p,q,从而解密
+Second Attack 适用场景：$|d_{1}-d_{2}|&lt;N^{\frac{r(r-1)}{(r&#43;1)^{2}}}，d_{1},d_{2}共享msb$
+根据文献中的方法，这个x可以通过small_root计算出来，得到x之后，gcd(f(x),N)==g,借g开方处理出p,d3ctf的那题就可以这么做
+有三种情况
+$g=p^{r-1} \ \ p=g^{\frac{1}{r-1}}$
+$g=p^{r} \ \ p=g^{\frac{1}{r}}$
+$g=p^{r-1}*q \ \ p=\frac{N}{g}$
+Third Attack 适用场景：$|p_{1}-p_{2}|&lt;\frac{p_{1}}{2rq_{1}q_{1}}$,$p_{1}&gt;p_{2},p_{1},p_{2}共享msb$
+N2/N1，连分数算法求前面的连分数，每一个都可能是q2/q1
+得到q1,q2之后算出p1,p2求d解密
+sage中也有可以调用的函数
+根据条件判断，先算出q之后求开r次方求q。
+例如文中的：
+例题： d^3ctf d3factor from Crypto.Util.number import bytes_to_long, getPrime from secret import msg from sympy import nextprime from gmpy2 import invert from hashlib import md5 flag = &#39;d3ctf{&#39;&#43;md5(msg).hexdigest()&#43;&#39;}&#39; p = getPrime(256) q = getPrime(256) assert p &gt; q n = p * q e = 0x10001 m = bytes_to_long(msg) c = pow(m, e, n) N = pow(p, 7) * q phi = pow(p, 6) * (p - 1) * (q - 1) d1 = getPrime(2000) d2 = nextprime(d1 &#43; getPrime(1000)) e1 = invert(d1, phi) e2 = invert(d2, phi) print(f&#39;c = {c}&#39;) print(f&#39;N = {N}&#39;) print(f&#39;e1 = {e1}&#39;) print(f&#39;e2 = {e2}&#39;) &#39;&#39;&#39; c = 2420624631315473673388732074340410215657378096737020976722603529598864338532404224879219059105950005655100728361198499550862405660043591919681568611707967 N = 1476751427633071977599571983301151063258376731102955975364111147037204614220376883752032253407881568290520059515340434632858734689439268479399482315506043425541162646523388437842149125178447800616137044219916586942207838674001004007237861470176454543718752182312318068466051713087927370670177514666860822341380494154077020472814706123209865769048722380888175401791873273850281384147394075054950169002165357490796510950852631287689747360436384163758289159710264469722036320819123313773301072777844457895388797742631541101152819089150281489897683508400098693808473542212963868834485233858128220055727804326451310080791 e1 = 425735006018518321920113858371691046233291394270779139216531379266829453665704656868245884309574741300746121946724344532456337490492263690989727904837374279175606623404025598533405400677329916633307585813849635071097268989906426771864410852556381279117588496262787146588414873723983855041415476840445850171457530977221981125006107741100779529209163446405585696682186452013669643507275620439492021019544922913941472624874102604249376990616323884331293660116156782891935217575308895791623826306100692059131945495084654854521834016181452508329430102813663713333608459898915361745215871305547069325129687311358338082029 e2 = 1004512650658647383814190582513307789549094672255033373245432814519573537648997991452158231923692387604945039180687417026069655569594454408690445879849410118502279459189421806132654131287284719070037134752526923855821229397612868419416851456578505341237256609343187666849045678291935806441844686439591365338539029504178066823886051731466788474438373839803448380498800384597878814991008672054436093542513518012957106825842251155935855375353004898840663429274565622024673235081082222394015174831078190299524112112571718817712276118850981261489528540025810396786605197437842655180663611669918785635193552649262904644919 &#39;&#39;&#39; 题目分析："/>
+
+    <meta property="og:title" content="RSA中p**r*q的三种情形" />
+<meta property="og:description" content="[TOC] 文献地址：
+
+文献： First Attack 适用场景：$ex-\phi(n)y=z$，$gcd(e,phi)=1$
+先small_root求出x,然后求公约数得到g，根据g处理出p,q,从而解密
+Second Attack 适用场景：$|d_{1}-d_{2}|&lt;N^{\frac{r(r-1)}{(r&#43;1)^{2}}}，d_{1},d_{2}共享msb$
+根据文献中的方法，这个x可以通过small_root计算出来，得到x之后，gcd(f(x),N)==g,借g开方处理出p,d3ctf的那题就可以这么做
+有三种情况
+$g=p^{r-1} \ \ p=g^{\frac{1}{r-1}}$
+$g=p^{r} \ \ p=g^{\frac{1}{r}}$
+$g=p^{r-1}*q \ \ p=\frac{N}{g}$
+Third Attack 适用场景：$|p_{1}-p_{2}|&lt;\frac{p_{1}}{2rq_{1}q_{1}}$,$p_{1}&gt;p_{2},p_{1},p_{2}共享msb$
+N2/N1，连分数算法求前面的连分数，每一个都可能是q2/q1
+得到q1,q2之后算出p1,p2求d解密
+sage中也有可以调用的函数
+根据条件判断，先算出q之后求开r次方求q。
+例如文中的：
+例题： d^3ctf d3factor from Crypto.Util.number import bytes_to_long, getPrime from secret import msg from sympy import nextprime from gmpy2 import invert from hashlib import md5 flag = &#39;d3ctf{&#39;&#43;md5(msg).hexdigest()&#43;&#39;}&#39; p = getPrime(256) q = getPrime(256) assert p &gt; q n = p * q e = 0x10001 m = bytes_to_long(msg) c = pow(m, e, n) N = pow(p, 7) * q phi = pow(p, 6) * (p - 1) * (q - 1) d1 = getPrime(2000) d2 = nextprime(d1 &#43; getPrime(1000)) e1 = invert(d1, phi) e2 = invert(d2, phi) print(f&#39;c = {c}&#39;) print(f&#39;N = {N}&#39;) print(f&#39;e1 = {e1}&#39;) print(f&#39;e2 = {e2}&#39;) &#39;&#39;&#39; c = 2420624631315473673388732074340410215657378096737020976722603529598864338532404224879219059105950005655100728361198499550862405660043591919681568611707967 N = 1476751427633071977599571983301151063258376731102955975364111147037204614220376883752032253407881568290520059515340434632858734689439268479399482315506043425541162646523388437842149125178447800616137044219916586942207838674001004007237861470176454543718752182312318068466051713087927370670177514666860822341380494154077020472814706123209865769048722380888175401791873273850281384147394075054950169002165357490796510950852631287689747360436384163758289159710264469722036320819123313773301072777844457895388797742631541101152819089150281489897683508400098693808473542212963868834485233858128220055727804326451310080791 e1 = 425735006018518321920113858371691046233291394270779139216531379266829453665704656868245884309574741300746121946724344532456337490492263690989727904837374279175606623404025598533405400677329916633307585813849635071097268989906426771864410852556381279117588496262787146588414873723983855041415476840445850171457530977221981125006107741100779529209163446405585696682186452013669643507275620439492021019544922913941472624874102604249376990616323884331293660116156782891935217575308895791623826306100692059131945495084654854521834016181452508329430102813663713333608459898915361745215871305547069325129687311358338082029 e2 = 1004512650658647383814190582513307789549094672255033373245432814519573537648997991452158231923692387604945039180687417026069655569594454408690445879849410118502279459189421806132654131287284719070037134752526923855821229397612868419416851456578505341237256609343187666849045678291935806441844686439591365338539029504178066823886051731466788474438373839803448380498800384597878814991008672054436093542513518012957106825842251155935855375353004898840663429274565622024673235081082222394015174831078190299524112112571718817712276118850981261489528540025810396786605197437842655180663611669918785635193552649262904644919 &#39;&#39;&#39; 题目分析：" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/rsa%E4%B8%ADn-p-r-q%E7%9A%84%E4%B8%89%E7%A7%8D%E7%89%B9%E6%AE%8A%E6%83%85%E5%BD%A2/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2024-01-03T17:14:06+08:00" />
+<meta property="article:modified_time" content="2024-01-03T17:14:06+08:00" />
+
+
+
+  </head>
+  <body>
+    <header class="app-header">
+      <a href=""><img class="app-header-avatar" src="/avatar.jpg" alt="John Doe" /></a>
+      <span class="app-header-title"></span>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vehicula turpis sit amet elit pretium.</p>
+    </header>
+    <main class="app-container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class ="post-title">RSA中p**r*q的三种情形</h1>
+      <div class="post-meta">
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-calendar">
+  <title>calendar</title>
+  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line>
+</svg>
+          Jan 3, 2024
+        </div>
+        <div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-clock">
+  <title>clock</title>
+  <circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline>
+</svg>
+          3 min read
+        </div>
+      </div>
+    </header>
+    <div class="post-content">
+      <p>[TOC]
+文献地址：</p>
+<p><a href="https://eprint.iacr.org/2015/399.pdf"></a></p>
+<h2 id="文献">文献：</h2>
+<h3 id="first-attack">First Attack</h3>
+<p>适用场景：$ex-\phi(n)y=z$，$gcd(e,phi)=1$</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled.png" alt="Untitled"></p>
+<p>先small_root求出x,然后求公约数得到g，根据g处理出p,q,从而解密</p>
+<h3 id="second-attack">Second Attack</h3>
+<p>适用场景：$|d_{1}-d_{2}|&lt;N^{\frac{r(r-1)}{(r+1)^{2}}}，d_{1},d_{2}共享msb$</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%201.png" alt="Untitled"></p>
+<p>根据文献中的方法，这个x可以通过small_root计算出来，得到x之后，gcd(f(x),N)==g,借g开方处理出p,d3ctf的那题就可以这么做</p>
+<p>有三种情况</p>
+<p>$g=p^{r-1}  \     \   p=g^{\frac{1}{r-1}}$</p>
+<p>$g=p^{r} \   \ p=g^{\frac{1}{r}}$</p>
+<p>$g=p^{r-1}*q   \ \ p=\frac{N}{g}$</p>
+<h3 id="third-attack">Third Attack</h3>
+<p>适用场景：$|p_{1}-p_{2}|&lt;\frac{p_{1}}{2rq_{1}q_{1}}$,$p_{1}&gt;p_{2},p_{1},p_{2}共享msb$</p>
+<p>N2/N1，连分数算法求前面的连分数，每一个都可能是q2/q1</p>
+<p>得到q1,q2之后算出p1,p2求d解密</p>
+<p>sage中也有可以调用的函数</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%202.png" alt="Untitled"></p>
+<p>根据条件判断，先算出q之后求开r次方求q。</p>
+<p>例如文中的：</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%203.png" alt="Untitled"></p>
+<h2 id="例题">例题：</h2>
+<h3 id="d3ctf--d3factor">d^3ctf  d3factor</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-java" data-lang="java">from Crypto<span style="color:#f92672">.</span><span style="color:#a6e22e">Util</span><span style="color:#f92672">.</span><span style="color:#a6e22e">number</span> <span style="color:#f92672">import</span> bytes_to_long<span style="color:#f92672">,</span> getPrime
+from secret <span style="color:#f92672">import</span> msg
+from sympy <span style="color:#f92672">import</span> nextprime
+from gmpy2 <span style="color:#f92672">import</span> invert
+from hashlib <span style="color:#f92672">import</span> md5
+
+flag <span style="color:#f92672">=</span> <span style="color:#960050;background-color:#1e0010">&#39;</span>d3ctf<span style="color:#f92672">{</span><span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">+</span>md5<span style="color:#f92672">(</span>msg<span style="color:#f92672">).</span><span style="color:#a6e22e">hexdigest</span><span style="color:#f92672">()+</span><span style="color:#e6db74">&#39;}&#39;</span>
+p <span style="color:#f92672">=</span> getPrime<span style="color:#f92672">(</span>256<span style="color:#f92672">)</span>
+q <span style="color:#f92672">=</span> getPrime<span style="color:#f92672">(</span>256<span style="color:#f92672">)</span>
+<span style="color:#66d9ef">assert</span> p <span style="color:#f92672">&gt;</span> q
+n <span style="color:#f92672">=</span> p <span style="color:#f92672">*</span> q
+e <span style="color:#f92672">=</span> 0x10001
+m <span style="color:#f92672">=</span> bytes_to_long<span style="color:#f92672">(</span>msg<span style="color:#f92672">)</span>
+c <span style="color:#f92672">=</span> pow<span style="color:#f92672">(</span>m<span style="color:#f92672">,</span> e<span style="color:#f92672">,</span> n<span style="color:#f92672">)</span>
+
+N <span style="color:#f92672">=</span> pow<span style="color:#f92672">(</span>p<span style="color:#f92672">,</span> 7<span style="color:#f92672">)</span> <span style="color:#f92672">*</span> q
+phi <span style="color:#f92672">=</span> pow<span style="color:#f92672">(</span>p<span style="color:#f92672">,</span> 6<span style="color:#f92672">)</span> <span style="color:#f92672">*</span> <span style="color:#f92672">(</span>p <span style="color:#f92672">-</span> 1<span style="color:#f92672">)</span> <span style="color:#f92672">*</span> <span style="color:#f92672">(</span>q <span style="color:#f92672">-</span> 1<span style="color:#f92672">)</span>
+d1 <span style="color:#f92672">=</span> getPrime<span style="color:#f92672">(</span>2000<span style="color:#f92672">)</span>
+d2 <span style="color:#f92672">=</span> nextprime<span style="color:#f92672">(</span>d1 <span style="color:#f92672">+</span> getPrime<span style="color:#f92672">(</span>1000<span style="color:#f92672">))</span>
+e1 <span style="color:#f92672">=</span> invert<span style="color:#f92672">(</span>d1<span style="color:#f92672">,</span> phi<span style="color:#f92672">)</span>
+e2 <span style="color:#f92672">=</span> invert<span style="color:#f92672">(</span>d2<span style="color:#f92672">,</span> phi<span style="color:#f92672">)</span>
+
+print<span style="color:#f92672">(</span>f<span style="color:#960050;background-color:#1e0010">&#39;</span>c <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>c<span style="color:#f92672">}</span><span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">)</span>
+print<span style="color:#f92672">(</span>f<span style="color:#960050;background-color:#1e0010">&#39;</span>N <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>N<span style="color:#f92672">}</span><span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">)</span>
+print<span style="color:#f92672">(</span>f<span style="color:#960050;background-color:#1e0010">&#39;</span>e1 <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>e1<span style="color:#f92672">}</span><span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">)</span>
+print<span style="color:#f92672">(</span>f<span style="color:#960050;background-color:#1e0010">&#39;</span>e2 <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>e2<span style="color:#f92672">}</span><span style="color:#960050;background-color:#1e0010">&#39;</span><span style="color:#f92672">)</span>
+<span style="color:#e6db74">&#39;&#39;&#39;</span>
+c <span style="color:#f92672">=</span> 2420624631315473673388732074340410215657378096737020976722603529598864338532404224879219059105950005655100728361198499550862405660043591919681568611707967
+N <span style="color:#f92672">=</span> 1476751427633071977599571983301151063258376731102955975364111147037204614220376883752032253407881568290520059515340434632858734689439268479399482315506043425541162646523388437842149125178447800616137044219916586942207838674001004007237861470176454543718752182312318068466051713087927370670177514666860822341380494154077020472814706123209865769048722380888175401791873273850281384147394075054950169002165357490796510950852631287689747360436384163758289159710264469722036320819123313773301072777844457895388797742631541101152819089150281489897683508400098693808473542212963868834485233858128220055727804326451310080791
+e1 <span style="color:#f92672">=</span> 425735006018518321920113858371691046233291394270779139216531379266829453665704656868245884309574741300746121946724344532456337490492263690989727904837374279175606623404025598533405400677329916633307585813849635071097268989906426771864410852556381279117588496262787146588414873723983855041415476840445850171457530977221981125006107741100779529209163446405585696682186452013669643507275620439492021019544922913941472624874102604249376990616323884331293660116156782891935217575308895791623826306100692059131945495084654854521834016181452508329430102813663713333608459898915361745215871305547069325129687311358338082029
+e2 <span style="color:#f92672">=</span> 1004512650658647383814190582513307789549094672255033373245432814519573537648997991452158231923692387604945039180687417026069655569594454408690445879849410118502279459189421806132654131287284719070037134752526923855821229397612868419416851456578505341237256609343187666849045678291935806441844686439591365338539029504178066823886051731466788474438373839803448380498800384597878814991008672054436093542513518012957106825842251155935855375353004898840663429274565622024673235081082222394015174831078190299524112112571718817712276118850981261489528540025810396786605197437842655180663611669918785635193552649262904644919
+<span style="color:#e6db74">&#39;&#39;&#39;</span>
+</code></pre></div><p>题目分析：</p>
+<p>根据</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%204.png" alt="Untitled"></p>
+<p>可以判断$d_{1},d_{2}的高位相同$，符合文献中的第二种情形</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%205.png" alt="Untitled"></p>
+<p>根据$e_{1}，e_{2}求d_{1},d_{2},设x=d_{1}-d_{2}然后按照文献中的方式gcd得到p,q从而达到求解得目的$</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%206.png" alt="Untitled"></p>
+<p>Code：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">N <span style="color:#f92672">=</span> <span style="color:#ae81ff">1476751427633071977599571983301151063258376731102955975364111147037204614220376883752032253407881568290520059515340434632858734689439268479399482315506043425541162646523388437842149125178447800616137044219916586942207838674001004007237861470176454543718752182312318068466051713087927370670177514666860822341380494154077020472814706123209865769048722380888175401791873273850281384147394075054950169002165357490796510950852631287689747360436384163758289159710264469722036320819123313773301072777844457895388797742631541101152819089150281489897683508400098693808473542212963868834485233858128220055727804326451310080791</span>
+e1 <span style="color:#f92672">=</span> <span style="color:#ae81ff">425735006018518321920113858371691046233291394270779139216531379266829453665704656868245884309574741300746121946724344532456337490492263690989727904837374279175606623404025598533405400677329916633307585813849635071097268989906426771864410852556381279117588496262787146588414873723983855041415476840445850171457530977221981125006107741100779529209163446405585696682186452013669643507275620439492021019544922913941472624874102604249376990616323884331293660116156782891935217575308895791623826306100692059131945495084654854521834016181452508329430102813663713333608459898915361745215871305547069325129687311358338082029</span>
+e2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">1004512650658647383814190582513307789549094672255033373245432814519573537648997991452158231923692387604945039180687417026069655569594454408690445879849410118502279459189421806132654131287284719070037134752526923855821229397612868419416851456578505341237256609343187666849045678291935806441844686439591365338539029504178066823886051731466788474438373839803448380498800384597878814991008672054436093542513518012957106825842251155935855375353004898840663429274565622024673235081082222394015174831078190299524112112571718817712276118850981261489528540025810396786605197437842655180663611669918785635193552649262904644919</span>
+<span style="color:#f92672">import</span> hashlib
+y<span style="color:#f92672">=</span><span style="color:#ae81ff">6026188071205144053368734157378113871998610498635758102306924949208539409278951959968138902906878320358536089190856063838203652085411343275918136041503018654914512075174785716697544493562866611023489700861401711316474669786472712436070391719434465362891545258455898553431580803183299730942414936305178</span>
+<span style="color:#f92672">import</span> gmpy2
+<span style="color:#75715e"># print(gmpy2.gcd((e1*e2*y-(e1-e2)),N))</span>
+p7<span style="color:#f92672">=</span><span style="color:#ae81ff">302041005420039804788837973713898327221537364540217123524277085489425015387406302827931741511110799839253993542589980437030294737549654496720894473925249726898113670841165053274897225331487693822448903890664321018179858685020471572484115220669783927170647297629616743131628132318835058700355916820746650505209238111625956099990183829787016000154371928717007922683297772484179270642107118214144502646097942422343431687478702790785714060858198343943546186776012201</span>
+<span style="color:#75715e"># print(gmpy2.iroot(p7,6)[0])</span>
+p<span style="color:#f92672">=</span><span style="color:#ae81ff">81911394167511996830305370213894554209992159667974516868378702592733037962549</span>
+q<span style="color:#f92672">=</span>N<span style="color:#f92672">//</span>(p<span style="color:#f92672">**</span><span style="color:#ae81ff">7</span>)
+<span style="color:#75715e"># print(q)</span>
+q<span style="color:#f92672">=</span><span style="color:#ae81ff">59689394622751323780317475130818337618980301243859922297121750335804594909859</span>
+e<span style="color:#f92672">=</span><span style="color:#ae81ff">65537</span>
+d<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>invert(e,(p<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+<span style="color:#75715e"># print(d)</span>
+c <span style="color:#f92672">=</span> <span style="color:#ae81ff">2420624631315473673388732074340410215657378096737020976722603529598864338532404224879219059105950005655100728361198499550862405660043591919681568611707967</span>
+m<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>powmod(c,d,p<span style="color:#f92672">*</span>q)
+<span style="color:#75715e"># print(m)</span>
+<span style="color:#f92672">from</span> Crypto.Util.number <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+print(long_to_bytes(m))
+m<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;MM is still working on Valentine&#39;s Day.You can&#39;t be like him.&#34;</span><span style="color:#f92672">.</span>encode()
+flag <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;d3ctf{&#39;</span><span style="color:#f92672">+</span>hashlib<span style="color:#f92672">.</span>md5(m)<span style="color:#f92672">.</span>hexdigest()<span style="color:#f92672">+</span><span style="color:#e6db74">&#39;}&#39;</span>
+print(flag)
+</code></pre></div><h3 id="强网杯-factor">强网杯 factor</h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#75715e">#encoding:utf-8</span>
+<span style="color:#f92672">from</span> Crypto.Util.number <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">from</span> gmpy2 <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">from</span> random <span style="color:#f92672">import</span> randint
+<span style="color:#f92672">from</span> flag <span style="color:#f92672">import</span> flag
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">gen1</span>():
+	r <span style="color:#f92672">=</span> <span style="color:#ae81ff">2</span>
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		p2 <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">1792</span>)
+		p1 <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">1792</span>)
+
+		q1 <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">512</span>)
+		q2 <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">512</span>)
+
+		<span style="color:#66d9ef">if</span> (abs(p1<span style="color:#f92672">-</span>p2) <span style="color:#f92672">&lt;</span> (p1<span style="color:#f92672">//</span>(<span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>r<span style="color:#f92672">*</span>q1<span style="color:#f92672">*</span>q2))):
+			n1, n2 <span style="color:#f92672">=</span> (p1<span style="color:#f92672">**</span>r)<span style="color:#f92672">*</span>q1, (p2<span style="color:#f92672">**</span>r)<span style="color:#f92672">*</span>q2
+			<span style="color:#66d9ef">break</span>
+
+	phi1 <span style="color:#f92672">=</span> (p1<span style="color:#f92672">**</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">*</span>(p1<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q1<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+	phi2 <span style="color:#f92672">=</span> (p2<span style="color:#f92672">**</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">*</span>(p2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		e1 <span style="color:#f92672">=</span> randint(<span style="color:#ae81ff">5</span>, (p1<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q1<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+		e2 <span style="color:#f92672">=</span> randint(<span style="color:#ae81ff">5</span>, (p2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+		<span style="color:#66d9ef">if</span> gcd(e1, e2) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">and</span> gcd(phi1, e1) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">and</span> gcd(phi2, e2) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>:
+			<span style="color:#66d9ef">break</span>
+	<span style="color:#66d9ef">return</span> n11, n12, e11, e12
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">gen2</span>():
+	r <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		p <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">512</span>)
+		q <span style="color:#f92672">=</span>	getPrime(<span style="color:#ae81ff">512</span>)
+		N <span style="color:#f92672">=</span> (p<span style="color:#f92672">**</span>r)<span style="color:#f92672">*</span>q
+		<span style="color:#66d9ef">if</span> len(bin(N)) <span style="color:#f92672">==</span> <span style="color:#ae81ff">4096</span>:
+			<span style="color:#66d9ef">break</span>
+
+	idx <span style="color:#f92672">=</span> (r<span style="color:#f92672">*</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)) <span style="color:#f92672">/</span> ((r<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(r<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>))
+	delta <span style="color:#f92672">=</span> int(pow(mpz(N), idx))
+	phi <span style="color:#f92672">=</span> (p<span style="color:#f92672">**</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">*</span>(p<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		d1 <span style="color:#f92672">=</span> getPrime(int(<span style="color:#ae81ff">2048</span><span style="color:#f92672">*</span>idx)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>)
+		d2 <span style="color:#f92672">=</span> getPrime(int(<span style="color:#ae81ff">2048</span><span style="color:#f92672">*</span>idx)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>)
+		<span style="color:#66d9ef">if</span> abs(d1<span style="color:#f92672">-</span>d2) <span style="color:#f92672">&lt;</span> delta:
+			m1 <span style="color:#f92672">=</span> invert(d1, phi)
+			m2 <span style="color:#f92672">=</span> invert(d2, phi)
+			<span style="color:#66d9ef">break</span>
+
+	e2 <span style="color:#f92672">=</span> <span style="color:#ae81ff">0x10001</span>
+	<span style="color:#66d9ef">return</span> n2, e2, m1, m2
+
+<span style="color:#66d9ef">def</span> <span style="color:#a6e22e">gen3</span>():
+	r <span style="color:#f92672">=</span> <span style="color:#ae81ff">7</span>
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		p <span style="color:#f92672">=</span> getPrime(<span style="color:#ae81ff">512</span>)
+		q <span style="color:#f92672">=</span>	getPrime(<span style="color:#ae81ff">512</span>)
+		N <span style="color:#f92672">=</span> (p<span style="color:#f92672">**</span>r)<span style="color:#f92672">*</span>q
+		phi <span style="color:#f92672">=</span> (p<span style="color:#f92672">**</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))<span style="color:#f92672">*</span>(p<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+
+		<span style="color:#66d9ef">if</span> len(bin(N))<span style="color:#f92672">-</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">4096</span>:
+			<span style="color:#66d9ef">break</span>
+
+	idx <span style="color:#f92672">=</span> (r<span style="color:#f92672">*</span>(r<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)) <span style="color:#f92672">/</span> ((r<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(r<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>))
+	delta <span style="color:#f92672">=</span> int(pow(mpz(N), idx))
+
+	<span style="color:#66d9ef">while</span> <span style="color:#66d9ef">True</span>:
+		b <span style="color:#f92672">=</span> getRandomNBitInteger(int(<span style="color:#ae81ff">2048</span><span style="color:#f92672">*</span>idx)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>)
+		a <span style="color:#f92672">=</span> getRandomNBitInteger(int(<span style="color:#ae81ff">2048</span><span style="color:#f92672">*</span>idx)<span style="color:#f92672">//</span><span style="color:#ae81ff">2</span>)
+		<span style="color:#66d9ef">if</span> a<span style="color:#f92672">*</span>b <span style="color:#f92672">&lt;</span> delta:
+			e <span style="color:#f92672">=</span> invert(a, phi)<span style="color:#f92672">*</span>b
+			<span style="color:#66d9ef">return</span> n3, e3, b
+
+n11, n12, e11, e12 <span style="color:#f92672">=</span> gen1()
+print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;n11=</span><span style="color:#e6db74">{</span>n11<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">n12=</span><span style="color:#e6db74">{</span>n12<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">e11=</span><span style="color:#e6db74">{</span>e11<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">e12=</span><span style="color:#e6db74">{</span>e12<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+n2, e2, m1, m2 <span style="color:#f92672">=</span> gen2()
+print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;n2=</span><span style="color:#e6db74">{</span>n2<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">e2=</span><span style="color:#e6db74">{</span>e2<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+n3, e3, b <span style="color:#f92672">=</span> gen3()
+print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;n3=</span><span style="color:#e6db74">{</span>n3<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">e3=</span><span style="color:#e6db74">{</span>e3<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+
+m3 <span style="color:#f92672">=</span> bytes_to_long(flag)
+c11 <span style="color:#f92672">=</span> powmod(m1, e11, n11)
+c12 <span style="color:#f92672">=</span> powmod(m2, e12, n12)
+c2 <span style="color:#f92672">=</span> powmod(b, e2, n2)
+c3 <span style="color:#f92672">=</span> powmod(m3, e3, n3)
+print(<span style="color:#e6db74">f</span><span style="color:#e6db74">&#34;c11=</span><span style="color:#e6db74">{</span>c11<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">c12=</span><span style="color:#e6db74">{</span>c12<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">c2=</span><span style="color:#e6db74">{</span>c2<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">c3=</span><span style="color:#e6db74">{</span>c3<span style="color:#e6db74">}</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>)
+<span style="color:#e6db74">&#39;&#39;&#39;
+</span><span style="color:#e6db74">n11=801049932940568005269978912396585741498810389425615966036828877784238116634177290247194019425111606811005728521368879065336038221361037062407029836155148874719789714345603547779284558101833801155509762818376470874215789574939002212274399950433269775325144015468620263028557804618774240232988157961712628677901130814703917513004114547234375629747176834581166306552311075522669403347828095831520693563291249869832390698646691647204371133362254846234990175138047928703289833460734235302093916147489509206061923877623300596194317059884824322527532662470348274079800781120104946546063500763852622187404608639542858285661288293918912184354236687975919510300221932074135531028314170475917110204254042336116619335841213418990605590620842511615815443114612333881430920769002933370887494558640833005339906706603497809846863863967391543647049224309556936909768179259581851520214669904560467640473144481633920438487615788689262961741053146610554997224861331949716721056553499531186695425439163222802917813140266513735841447717418846360096652592844940362932171019143434080184728093326143821165097895058935372215708948088248596585127475770021962501262915274497478428868130455122612016408381607561200802267038869516896665387576895570245272035575637
+</span><span style="color:#e6db74">n12=635401970340205725139325006504978344512744926958688031423448003992072769931808217486709574151492230879374574313457662436423263437792389711379687512056391117410807565492548718691166183372633151644917135272259770997096195518489056319350258673723095417922153182423913759272893696867426193704479752772511081457729513843682588951499551132432923147997238597538055902932123792252593514225328196541483451747314048080824405530742533473914329294346486691684904100406972073037050089861816604505650042953778360621934380815999541183067585498606053857125775979915077329566722531830089714823979965934190338538564188253271016367299890015449611141166780048763403252309160517164569110740561584100839212138661881615351382946813818078899882595313362934594951895560189003438775450675343590147821186953526262224973333962454561275321925151619178204499342339749637758100126893330994252902926509705617882239610380420830791088907378397226817514095468815228186716220057075095711894070032344613244803934541318573847029365563159918970404057137270884587905766828750387753130065274147902379993224780149663600462492281891320702134153853359393588902750423972068679293373333869389393970353760507436913233657422185531482023237384247535554666481760197851108297145147371
+</span><span style="color:#e6db74">e11=1898839980562048754607069073527844852132536432440793106124181406514770178066775988232362054809850074774981836898118651469424148725970708199461113088705044905633592578936333918328544505910996746428679299419879472444790941363558025887620570856598548320246426354974395765243741646121743413447132297230365355148066914830856904433750379114692122900723772114991199979638987571559860550883470977246459523068862898859694461427148626628283198896659337135438506574799585378178678790308410266713256003479022699264568844505977513537013529212961573269494683740987283682608189406719573301573662696753903050991812884192192569737274321828986847640839813424701894578472933385727757445011291134961124822612239865
+</span><span style="color:#e6db74">e12=1262647419018930022617189608995712260095623047273893811529510754596636390255564988827821761126917976430978175522450277907063247981106405519094560616378241247111698915199999363948015703788616554657275147338766805289909261129165025156078136718573006479030827585347458143645738353716189131209398056741864848486818076440355778886993462012533397208330925057305502653219173629466948635110352752162442552541812665607516753186595817376029707777599029040724727499952161261179707271814405907165207904499722122779096230563548011491932378429654764486855147873135769116637484240454596231092684424572258119768093562747249251518965380465994055049411715353547147466711949391814550591591830515262296556050946881
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">n2=209798341155088334158217087474227805455138848036904381404809759100627849272231840321985747935471287990313456209656625928356468120896887536235496490078123448217785939608443507649096688546074968476040552137270080120417769906047001451239544719039212180059396791491281787790213953488743488306241516010351179070869410418232801398578982244984544906579574766534671056023774009163991804748763929626213884208260660722705479782932001102089367261720194650874553305179520889083170973755913964440175393646890791491057655226024046525748177999422035469428780228224800114202385209306803288475439775037067014297973202621118959024226798935588827359265962780792266516120013602384766460619793738405476219362508944225007365127768741191310079985425349292613888185378948854602285379329682053663283534930182589905986063348509703027498270111412063194971956202729807710253369312175636837558252924035002153389909587349043986253518050303628071319876207392440085675892353421232158925122721273720564784886530611286461575045181073744696415657043278123662980166364494583141297996445429477446442693717498789391918530672770193730629928408766563592081857706608049076318165712479742423149330311238462044666384622153280310696667586565906758451118241914402257039981388209
+</span><span style="color:#e6db74">e2=65537
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">n3=539779851369541956878655738599584730199799866957191805784596190682932284216781781433367450841202917758999300635019369629627621029957135109806205877317954671312041249493462048283611940752235036153024920172209763260723728345918562258401803973624430150143563078517485996070862532682695228590709019451174548520135142052216785774589096706631010293690859363524584240662502290912412366366114571976050857239915691266377257797199583543940504695517331512813468837128344612227973709974625418257243011036826241599265375741977853552204640800449679679351666009764297016524814036295707311913711955324055690490892097177271718850857268982130811714517356073266905474635370690445031512184247179039751734276906533177939993769044135143389748416635981226449566039039202521305851567296884751935162651063209779647359922622084851547605090230221057349511482738300221222563908357379545905837110168948295030747460300104202323692732549831403834387939156877086852393515817984772384147449841124275061609701453997579569931391166586163299940486204581696722731952467570857217406030804590055255431828403195798003509083922294733709507134156466158642941338493323430671502043066148246348074878064089651235355282144209668143249348243220714471988019011613749340243917652821
+</span><span style="color:#e6db74">e3=8179300978753084587812861894047395225516049110376948812109811319430275614612773726672345893359691900281432484382670047044697374818043512731533402576374645405477207239801498428774783768163880078495448747421425078521981578408638790336528372019271073712013371141939808017049399434858687299480461753638164719404612128939787055797762174745092074547412183349192156638711750872083313795551439465507724807626674514935170104573715458782366469587138508845980490673890245713729782917089910271980557159592807350504157192913530007199510144004848020221181558472160543018733124225266127379373751910439604459368078652499029070936707349862139053913745186413782066470461478961703013591655136140060879250067379283913798867648758171004535775565306842444545755351202796833177560656564652632975685912935281581268141803696686952259539945588609591385807620108279333498170028167338690235117003515264281843953984997958878272347778561933726792473981855755454522886321669676790813189668084373153897754540290867346751033567500922477317530445967753955221454744946208555394588111484610700789566547507402309549957740815535069057837915204852490930168843605732632328017129154852857227895362549146737618906180651623216848500491438142456250653458053922622240299736136335179639180898730269690699965799644757774472147210271111150769048976871249731156387939260749192370361488285775377622944817570292095201906142567403539151179209316853493906909989301225903409448461436855145
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">c11=18979511327426975645936984732782737165217332092805655747550406443960209507493506811471688957217003792679188427155591583024966608843371190136274378868083075515877811693937328204553788450031542610082653080302874606750443090466407543829279067099563572849101374714795279414177737277837595409805721290786607138569322435729584574023597293220443351227559400618351504654781318871214405850541820427562291662456382362148698864044961814456827646881685994720468255382299912036854657082505810206237294593538092338544641919051145900715456411365065867357857347860000894624247098719102875782712030938806816332901861114078070638796157513248160442185781635520426230183818695937457557248160135402734489627723104008584934936245208116232179751448263136309595931691285743580695792601141363221346329077184688857290503770641398917586422369221744736905117499140140651493031622040723274355292502182795605723573863581253354922291984335841915632076694172921289489383700174864888664946302588049384130628381766560976143458735712162489811693014419190718601945154153130272620025118408017441490090252674737105557818759190934585829634273698371996797545908125156282869589331913665938038870431655063063535672001112420959158339261862052308986374193671007982914711432579</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">c12=336587005671304527566745948355290412636261748969581976214239578621816863343117433524033533838636941679300497270909696775021031004312477997130741361709262822736904340641138652359632950455651920464042448022467664596484055174270895170499076347333381222768518599018520948098943626229061996126260154604038101543546588917619576702866444998578555907070990331574722135141778182631559802154493815687284077524469331290249057291163803290619701104007028836609832847351748020354798788508790258935718399783002069490123663345156902440501507117289747695510266461539019431610123351176227443612317037899257774045751487135646052309277098939919088029284437221840182769808850184827681307611389353392683707516141736067793897378911235819049432542758429901945202632117089595899280390575706266239252841152490534353760118231918190110043319877744119083811214707593122757409240645257409097436061825613686773916466122693168971062418046703969144004779270391320645495586024342668002497155358623795942692477164489475917351003149045087283510728981096449890130735055015075557614253867698702479920619299919816768972581273507837309179450374634916567083251630203067065663910073926990517108921490442919372774170201239734064819301693527366233007925670043499415100789027665
+</span><span style="color:#e6db74">c2=18352572608055902550350386950073774530453857897248738030380007830701135570310622004368605208336922266513238134127496822199799761713782366178177809597137102612444147565578155260524747439899150012223027218489946124086276814899675563837669559795153349686434242738207425653079514376089070980797596457151965772460109519623572502109592612394316680202287712465721767341302234806130244551387296133051760893033194962691942040228545508895009195291106297581470066545991352668826197346830561010198417527057944507902143965634058848276017283478933675052993657822322866778994956205033704582047618324071045349072526540250707463112668579342537349567247810715604220690215313641329522674080146047291570752430231923566302463491877377617044768978997438596643458475128936850994934029476030136643053997549253792076260765459166618369864942681056864815996253315631930002738854235841120321870075261782250357506436825550088826469396508045912258303652912217151127280959435741419961721418428605515096160344688795655562889755165362006775317188009008288782691705879510655892181975003485714604340542378477388225736316682379616676770234557939471098919647053799313777248678455620231721202780830980063824003076308811540534492317719811588898727134190545533822501681653
+</span><span style="color:#e6db74">c3=113097822337683973761068913398570777162211043704088253732500045618770280334319497174908657828372816818344430304314992760410247741225285170975119344962728883084314382093407445567724674775086423808679124143380073906159023182353116556175251427048715466914368972746661938211846262612414049036821553068430149530397389927209475908905748728402722287875974303298260579839357610962198145974153609818939841880084892796820949226354126424023144300953584658958900737493704530725894948802258740332090822797815745616247879170037794873059391625680745994045522420168248552864215035136318711240256011217929372430302003068882829637056296413462078222453765071094277727760527662423010417144554652783429899139309180017349156600053882338180319473460877576898373222480215735280046214925463242092830060830764299787309912687294672319845054775281463150375545716818434962456139485501224661520991156961587158843064393883274763714930309353593180897123378717852182761518709151878662808890356934477932099818218743384674756674800089177733447066489275506387382342429495897972218764782517198727316942685748481956118012927027254979181519862451112593068440686462293151078537886822555211870303467014484443432209106264020502334805536091587252238173816637270028678636848763
+</span><span style="color:#e6db74">
+</span><span style="color:#e6db74">&#39;&#39;&#39;</span>
+</code></pre></div><p>这道题是三种情况都全了，而且明显的给出了条件。</p>
+<p>逐个分析一下题目里给出的条件，</p>
+<p>gen1:</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%207.png" alt="Untitled"></p>
+<p>符合$|p_{1}-p_{2}|&lt;\frac{p_{1}}{2rq_{1}q_{1}}$的条件，文中给出的方式是，通过连分数计算q2/q1，然后开方得p</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> gmpy2
+<span style="color:#f92672">from</span> Crypto.Util.number <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+<span style="color:#f92672">import</span> ContinuedFractions
+
+N1<span style="color:#f92672">=</span><span style="color:#ae81ff">801049932940568005269978912396585741498810389425615966036828877784238116634177290247194019425111606811005728521368879065336038221361037062407029836155148874719789714345603547779284558101833801155509762818376470874215789574939002212274399950433269775325144015468620263028557804618774240232988157961712628677901130814703917513004114547234375629747176834581166306552311075522669403347828095831520693563291249869832390698646691647204371133362254846234990175138047928703289833460734235302093916147489509206061923877623300596194317059884824322527532662470348274079800781120104946546063500763852622187404608639542858285661288293918912184354236687975919510300221932074135531028314170475917110204254042336116619335841213418990605590620842511615815443114612333881430920769002933370887494558640833005339906706603497809846863863967391543647049224309556936909768179259581851520214669904560467640473144481633920438487615788689262961741053146610554997224861331949716721056553499531186695425439163222802917813140266513735841447717418846360096652592844940362932171019143434080184728093326143821165097895058935372215708948088248596585127475770021962501262915274497478428868130455122612016408381607561200802267038869516896665387576895570245272035575637</span>
+N2<span style="color:#f92672">=</span><span style="color:#ae81ff">635401970340205725139325006504978344512744926958688031423448003992072769931808217486709574151492230879374574313457662436423263437792389711379687512056391117410807565492548718691166183372633151644917135272259770997096195518489056319350258673723095417922153182423913759272893696867426193704479752772511081457729513843682588951499551132432923147997238597538055902932123792252593514225328196541483451747314048080824405530742533473914329294346486691684904100406972073037050089861816604505650042953778360621934380815999541183067585498606053857125775979915077329566722531830089714823979965934190338538564188253271016367299890015449611141166780048763403252309160517164569110740561584100839212138661881615351382946813818078899882595313362934594951895560189003438775450675343590147821186953526262224973333962454561275321925151619178204499342339749637758100126893330994252902926509705617882239610380420830791088907378397226817514095468815228186716220057075095711894070032344613244803934541318573847029365563159918970404057137270884587905766828750387753130065274147902379993224780149663600462492281891320702134153853359393588902750423972068679293373333869389393970353760507436913233657422185531482023237384247535554666481760197851108297145147371</span>
+e1<span style="color:#f92672">=</span><span style="color:#ae81ff">1898839980562048754607069073527844852132536432440793106124181406514770178066775988232362054809850074774981836898118651469424148725970708199461113088705044905633592578936333918328544505910996746428679299419879472444790941363558025887620570856598548320246426354974395765243741646121743413447132297230365355148066914830856904433750379114692122900723772114991199979638987571559860550883470977246459523068862898859694461427148626628283198896659337135438506574799585378178678790308410266713256003479022699264568844505977513537013529212961573269494683740987283682608189406719573301573662696753903050991812884192192569737274321828986847640839813424701894578472933385727757445011291134961124822612239865</span>
+e2<span style="color:#f92672">=</span><span style="color:#ae81ff">1262647419018930022617189608995712260095623047273893811529510754596636390255564988827821761126917976430978175522450277907063247981106405519094560616378241247111698915199999363948015703788616554657275147338766805289909261129165025156078136718573006479030827585347458143645738353716189131209398056741864848486818076440355778886993462012533397208330925057305502653219173629466948635110352752162442552541812665607516753186595817376029707777599029040724727499952161261179707271814405907165207904499722122779096230563548011491932378429654764486855147873135769116637484240454596231092684424572258119768093562747249251518965380465994055049411715353547147466711949391814550591591830515262296556050946881</span>
+c1<span style="color:#f92672">=</span><span style="color:#ae81ff">18979511327426975645936984732782737165217332092805655747550406443960209507493506811471688957217003792679188427155591583024966608843371190136274378868083075515877811693937328204553788450031542610082653080302874606750443090466407543829279067099563572849101374714795279414177737277837595409805721290786607138569322435729584574023597293220443351227559400618351504654781318871214405850541820427562291662456382362148698864044961814456827646881685994720468255382299912036854657082505810206237294593538092338544641919051145900715456411365065867357857347860000894624247098719102875782712030938806816332901861114078070638796157513248160442185781635520426230183818695937457557248160135402734489627723104008584934936245208116232179751448263136309595931691285743580695792601141363221346329077184688857290503770641398917586422369221744736905117499140140651493031622040723274355292502182795605723573863581253354922291984335841915632076694172921289489383700174864888664946302588049384130628381766560976143458735712162489811693014419190718601945154153130272620025118408017441490090252674737105557818759190934585829634273698371996797545908125156282869589331913665938038870431655063063535672001112420959158339261862052308986374193671007982914711432579</span>
+c2<span style="color:#f92672">=</span><span style="color:#ae81ff">336587005671304527566745948355290412636261748969581976214239578621816863343117433524033533838636941679300497270909696775021031004312477997130741361709262822736904340641138652359632950455651920464042448022467664596484055174270895170499076347333381222768518599018520948098943626229061996126260154604038101543546588917619576702866444998578555907070990331574722135141778182631559802154493815687284077524469331290249057291163803290619701104007028836609832847351748020354798788508790258935718399783002069490123663345156902440501507117289747695510266461539019431610123351176227443612317037899257774045751487135646052309277098939919088029284437221840182769808850184827681307611389353392683707516141736067793897378911235819049432542758429901945202632117089595899280390575706266239252841152490534353760118231918190110043319877744119083811214707593122757409240645257409097436061825613686773916466122693168971062418046703969144004779270391320645495586024342668002497155358623795942692477164489475917351003149045087283510728981096449890130735055015075557614253867698702479920619299919816768972581273507837309179450374634916567083251630203067065663910073926990517108921490442919372774170201239734064819301693527366233007925670043499415100789027665</span>
+
+a<span style="color:#f92672">=</span>ContinuedFractions<span style="color:#f92672">.</span>rational_to_contfrac(N2,N1)
+b<span style="color:#f92672">=</span>ContinuedFractions<span style="color:#f92672">.</span>convergents_from_contfrac(a)
+print(len(b))
+<span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">2386</span>):
+    q2<span style="color:#f92672">=</span>b[i][<span style="color:#ae81ff">0</span>]
+    <span style="color:#66d9ef">if</span> q2<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">continue</span>
+    <span style="color:#66d9ef">if</span> N2<span style="color:#f92672">%</span>q2<span style="color:#f92672">==</span><span style="color:#ae81ff">0</span>:
+        p2<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>iroot(N2<span style="color:#f92672">//</span>q2,<span style="color:#ae81ff">2</span>)[<span style="color:#ae81ff">0</span>]
+        <span style="color:#66d9ef">if</span> p2<span style="color:#f92672">**</span><span style="color:#ae81ff">2</span><span style="color:#f92672">*</span>q2<span style="color:#f92672">==</span>N2:
+            <span style="color:#75715e"># print(&#34;p2:&#34;)</span>
+            <span style="color:#75715e"># print(p2)</span>
+            <span style="color:#75715e"># print(q2)</span>
+            phi2<span style="color:#f92672">=</span>(p2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q2<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>p2
+            d2<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>invert(e2,phi2)
+            m2<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>powmod(c2,d2,N2)
+            print(m2)
+    q1 <span style="color:#f92672">=</span> b[i][<span style="color:#ae81ff">1</span>]
+    <span style="color:#66d9ef">if</span> q1 <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+        <span style="color:#66d9ef">continue</span>
+    <span style="color:#66d9ef">if</span> N1 <span style="color:#f92672">%</span> q1 <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>:
+        p1 <span style="color:#f92672">=</span> gmpy2<span style="color:#f92672">.</span>iroot(N1<span style="color:#f92672">//</span> q1, <span style="color:#ae81ff">2</span>)[<span style="color:#ae81ff">0</span>]
+        <span style="color:#66d9ef">if</span> p1 <span style="color:#f92672">**</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> q1 <span style="color:#f92672">==</span> N1:
+            <span style="color:#75715e"># print(&#34;p1:&#34;)</span>
+            <span style="color:#75715e"># print(p1)</span>
+            <span style="color:#75715e"># print(q1)</span>
+            phi1 <span style="color:#f92672">=</span> (p1 <span style="color:#f92672">**</span> (<span style="color:#ae81ff">2</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)) <span style="color:#f92672">*</span> (p1 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">*</span> (q1 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>)
+            d2 <span style="color:#f92672">=</span> gmpy2<span style="color:#f92672">.</span>invert(e1, phi1)
+            m1 <span style="color:#f92672">=</span> gmpy2<span style="color:#f92672">.</span>powmod(c1, d2, N1)
+            print(m1)
+</code></pre></div><p>(m2,m1):</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">m2<span style="color:#f92672">=</span><span style="color:#ae81ff">69076592619651589706691933313826601279528159013379300261609967352748175972662567592943146333144902972780621576811778115958019397062270814057821407036352529372113467206560849267275602453288227390740346959857322649956992529510338912182696854496200041245775322561359546062736323363354733510660780489558215103581313753430117471361013972291126160134685745917715386613876414886325025010348396410346222272648657374977901786530969589123771261040601627906959627351426881111464943086191212001374558078570830214670111422731410682212770683631011038163623234630601007231955235905528750031898751733232446644402069580930596404887288935724879795199659228145390574503341087565153744389617539607111733080406125228559950446336384154674927952991964565965760896308198785777527690939982523416579778957846249005801121682470447753074839399698315364445972142571727376297422736232659133510385808957304351692629177239808890209690661982628408419571131470406142532800330250274534615063537773403062635865734585850821677880659194795963303700015814615804751909674946908768425855361277478190640780518117596780808975720826484146074528564147729911624750510271539697935538038871993380673492022099183863825435237650082706168588306816635866830411481021066926833372846305</span>
+m1<span style="color:#f92672">=</span><span style="color:#ae81ff">167033559384298522723574512241709447697750495062051373339874928117760768631565225663704494711294488556402223152830158600944819657473430506318731286655519728589208977191031849602792050411662024383502548579402516538753112670329781366297260905517214408459895097308286783418547254449419676568096534767340832822470233461516097690657337287889405321592527860524201824371955082411119548743528220794151774190322092515459637969925138496615421690273925560390321721643556915400569894100488394008220811596560968566833296068500476868375996187754631888256419438775013308064639754700359028260289266420692324376220460340153811660590804281527733243177527178698523018103373311259548716062006020121615186595491453534952848570829485638553678760994354019044715078062414748269425818079274218450448217803229617020494546843594180682307375768323235309661628678546003718924902228908888185484412626429441196588985691713767554591991735686919964937441820738008046218954331990752603146125777571183543616375946363623251491371247594696767767918341279655251868517380267258878990871525012299220182939441091806206624720194246691865367941280852353547267930167542329486261552854451001546455904682702366584763940463481732752992487773878685793275652314513014646439770319249</span>
+</code></pre></div><p>m1，m2是gen2返回的结果,可以按照d3的那种做法求出<code>c2 = powmod(b, e2, n2)</code> 的私钥d</p>
+<p>从而求b</p>
+<p>gen2:</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%208.png" alt="Untitled"></p>
+<p>m对应的位置就是rsa中加密指数e的位置，也就是第二种类型</p>
+<p>得到<code>b=17623328397444755087284107444487160871617682792372566887446834913712379373851213638071138745775127796589871734472781755930251379295485892067473329763997583502625804363418069062645997342172778252731889437</code></p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%209.png" alt="Untitled"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python">N <span style="color:#f92672">=</span> <span style="color:#ae81ff">209798341155088334158217087474227805455138848036904381404809759100627849272231840321985747935471287990313456209656625928356468120896887536235496490078123448217785939608443507649096688546074968476040552137270080120417769906047001451239544719039212180059396791491281787790213953488743488306241516010351179070869410418232801398578982244984544906579574766534671056023774009163991804748763929626213884208260660722705479782932001102089367261720194650874553305179520889083170973755913964440175393646890791491057655226024046525748177999422035469428780228224800114202385209306803288475439775037067014297973202621118959024226798935588827359265962780792266516120013602384766460619793738405476219362508944225007365127768741191310079985425349292613888185378948854602285379329682053663283534930182589905986063348509703027498270111412063194971956202729807710253369312175636837558252924035002153389909587349043986253518050303628071319876207392440085675892353421232158925122721273720564784886530611286461575045181073744696415657043278123662980166364494583141297996445429477446442693717498789391918530672770193730629928408766563592081857706608049076318165712479742423149330311238462044666384622153280310696667586565906758451118241914402257039981388209</span>
+
+e1 <span style="color:#f92672">=</span><span style="color:#ae81ff">167033559384298522723574512241709447697750495062051373339874928117760768631565225663704494711294488556402223152830158600944819657473430506318731286655519728589208977191031849602792050411662024383502548579402516538753112670329781366297260905517214408459895097308286783418547254449419676568096534767340832822470233461516097690657337287889405321592527860524201824371955082411119548743528220794151774190322092515459637969925138496615421690273925560390321721643556915400569894100488394008220811596560968566833296068500476868375996187754631888256419438775013308064639754700359028260289266420692324376220460340153811660590804281527733243177527178698523018103373311259548716062006020121615186595491453534952848570829485638553678760994354019044715078062414748269425818079274218450448217803229617020494546843594180682307375768323235309661628678546003718924902228908888185484412626429441196588985691713767554591991735686919964937441820738008046218954331990752603146125777571183543616375946363623251491371247594696767767918341279655251868517380267258878990871525012299220182939441091806206624720194246691865367941280852353547267930167542329486261552854451001546455904682702366584763940463481732752992487773878685793275652314513014646439770319249</span>
+
+e2 <span style="color:#f92672">=</span><span style="color:#ae81ff">69076592619651589706691933313826601279528159013379300261609967352748175972662567592943146333144902972780621576811778115958019397062270814057821407036352529372113467206560849267275602453288227390740346959857322649956992529510338912182696854496200041245775322561359546062736323363354733510660780489558215103581313753430117471361013972291126160134685745917715386613876414886325025010348396410346222272648657374977901786530969589123771261040601627906959627351426881111464943086191212001374558078570830214670111422731410682212770683631011038163623234630601007231955235905528750031898751733232446644402069580930596404887288935724879795199659228145390574503341087565153744389617539607111733080406125228559950446336384154674927952991964565965760896308198785777527690939982523416579778957846249005801121682470447753074839399698315364445972142571727376297422736232659133510385808957304351692629177239808890209690661982628408419571131470406142532800330250274534615063537773403062635865734585850821677880659194795963303700015814615804751909674946908768425855361277478190640780518117596780808975720826484146074528564147729911624750510271539697935538038871993380673492022099183863825435237650082706168588306816635866830411481021066926833372846305</span>
+<span style="color:#f92672">import</span> hashlib
+y<span style="color:#f92672">=</span><span style="color:#ae81ff">3549384841973213309621072870106254602253656209014197632823411827739864720839737811030401306800875843661955913236834617545674409639259372934721570288281471569069146201536309734296340629562207991295283896</span>
+<span style="color:#f92672">import</span> gmpy2
+<span style="color:#75715e"># print(gmpy2.gcd(e1*e2*y-(e2-e1),N))</span>
+p7<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>gcd(e1<span style="color:#f92672">*</span>e2<span style="color:#f92672">*</span>y<span style="color:#f92672">-</span>(e2<span style="color:#f92672">-</span>e1),N)
+<span style="color:#75715e"># print(gmpy2.iroot(p7,7)[0])</span>
+p<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>iroot(p7,<span style="color:#ae81ff">6</span>)[<span style="color:#ae81ff">0</span>]
+<span style="color:#75715e"># print(p)</span>
+p7<span style="color:#f92672">=</span>p<span style="color:#f92672">**</span><span style="color:#ae81ff">7</span>
+q<span style="color:#f92672">=</span>N<span style="color:#f92672">//</span>p7
+<span style="color:#75715e"># print(q)</span>
+e<span style="color:#f92672">=</span><span style="color:#ae81ff">65537</span>
+d<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>invert(e,p<span style="color:#f92672">**</span><span style="color:#ae81ff">6</span><span style="color:#f92672">*</span>(p<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>))
+<span style="color:#75715e"># print(d)</span>
+c <span style="color:#f92672">=</span> <span style="color:#ae81ff">18352572608055902550350386950073774530453857897248738030380007830701135570310622004368605208336922266513238134127496822199799761713782366178177809597137102612444147565578155260524747439899150012223027218489946124086276814899675563837669559795153349686434242738207425653079514376089070980797596457151965772460109519623572502109592612394316680202287712465721767341302234806130244551387296133051760893033194962691942040228545508895009195291106297581470066545991352668826197346830561010198417527057944507902143965634058848276017283478933675052993657822322866778994956205033704582047618324071045349072526540250707463112668579342537349567247810715604220690215313641329522674080146047291570752430231923566302463491877377617044768978997438596643458475128936850994934029476030136643053997549253792076260765459166618369864942681056864815996253315631930002738854235841120321870075261782250357506436825550088826469396508045912258303652912217151127280959435741419961721418428605515096160344688795655562889755165362006775317188009008288782691705879510655892181975003485714604340542378477388225736316682379616676770234557939471098919647053799313777248678455620231721202780830980063824003076308811540534492317719811588898727134190545533822501681653</span>
+b<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>powmod(c,d,p<span style="color:#f92672">*</span>q)
+print(b)
+</code></pre></div><p>gen3:</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%2010.png" alt="Untitled"></p>
+<p>可以转换成$ea-k\phi{n}=b$，符合文献中第一种情况</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%2011.png" alt="Untitled"></p>
+<p>b的值对应第一种类型中的z的值，继续small_root</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%2012.png" alt="Untitled"></p>
+<p>解题脚本：</p>
+<p><img src="https://gra1n-cn.oss-cn-hangzhou.aliyuncs.com/Untitled%2013.png" alt="Untitled"></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-python" data-lang="python"><span style="color:#f92672">import</span> gmpy2
+<span style="color:#f92672">from</span> Crypto.Util.number <span style="color:#f92672">import</span> <span style="color:#f92672">*</span>
+n3<span style="color:#f92672">=</span><span style="color:#ae81ff">539779851369541956878655738599584730199799866957191805784596190682932284216781781433367450841202917758999300635019369629627621029957135109806205877317954671312041249493462048283611940752235036153024920172209763260723728345918562258401803973624430150143563078517485996070862532682695228590709019451174548520135142052216785774589096706631010293690859363524584240662502290912412366366114571976050857239915691266377257797199583543940504695517331512813468837128344612227973709974625418257243011036826241599265375741977853552204640800449679679351666009764297016524814036295707311913711955324055690490892097177271718850857268982130811714517356073266905474635370690445031512184247179039751734276906533177939993769044135143389748416635981226449566039039202521305851567296884751935162651063209779647359922622084851547605090230221057349511482738300221222563908357379545905837110168948295030747460300104202323692732549831403834387939156877086852393515817984772384147449841124275061609701453997579569931391166586163299940486204581696722731952467570857217406030804590055255431828403195798003509083922294733709507134156466158642941338493323430671502043066148246348074878064089651235355282144209668143249348243220714471988019011613749340243917652821</span>
+e3<span style="color:#f92672">=</span><span style="color:#ae81ff">8179300978753084587812861894047395225516049110376948812109811319430275614612773726672345893359691900281432484382670047044697374818043512731533402576374645405477207239801498428774783768163880078495448747421425078521981578408638790336528372019271073712013371141939808017049399434858687299480461753638164719404612128939787055797762174745092074547412183349192156638711750872083313795551439465507724807626674514935170104573715458782366469587138508845980490673890245713729782917089910271980557159592807350504157192913530007199510144004848020221181558472160543018733124225266127379373751910439604459368078652499029070936707349862139053913745186413782066470461478961703013591655136140060879250067379283913798867648758171004535775565306842444545755351202796833177560656564652632975685912935281581268141803696686952259539945588609591385807620108279333498170028167338690235117003515264281843953984997958878272347778561933726792473981855755454522886321669676790813189668084373153897754540290867346751033567500922477317530445967753955221454744946208555394588111484610700789566547507402309549957740815535069057837915204852490930168843605732632328017129154852857227895362549146737618906180651623216848500491438142456250653458053922622240299736136335179639180898730269690699965799644757774472147210271111150769048976871249731156387939260749192370361488285775377622944817570292095201906142567403539151179209316853493906909989301225903409448461436855145</span>
+b<span style="color:#f92672">=</span><span style="color:#ae81ff">17623328397444755087284107444487160871617682792372566887446834913712379373851213638071138745775127796589871734472781755930251379295485892067473329763997583502625804363418069062645997342172778252731889437</span>
+c3<span style="color:#f92672">=</span><span style="color:#ae81ff">113097822337683973761068913398570777162211043704088253732500045618770280334319497174908657828372816818344430304314992760410247741225285170975119344962728883084314382093407445567724674775086423808679124143380073906159023182353116556175251427048715466914368972746661938211846262612414049036821553068430149530397389927209475908905748728402722287875974303298260579839357610962198145974153609818939841880084892796820949226354126424023144300953584658958900737493704530725894948802258740332090822797815745616247879170037794873059391625680745994045522420168248552864215035136318711240256011217929372430302003068882829637056296413462078222453765071094277727760527662423010417144554652783429899139309180017349156600053882338180319473460877576898373222480215735280046214925463242092830060830764299787309912687294672319845054775281463150375545716818434962456139485501224661520991156961587158843064393883274763714930309353593180897123378717852182761518709151878662808890356934477932099818218743384674756674800089177733447066489275506387382342429495897972218764782517198727316942685748481956118012927027254979181519862451112593068440686462293151078537886822555211870303467014484443432209106264020502334805536091587252238173816637270028678636848763</span>
+res<span style="color:#f92672">=</span><span style="color:#ae81ff">16731588253866128571163910758846497670928988943944436618514118121761227689113110943465936457030051710610254169629932203082368465978112219532158626669990117160986135699541953274434781877420432743573801621</span>
+
+p7<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>gcd(e3<span style="color:#f92672">*</span>res<span style="color:#f92672">-</span>b,n3)
+<span style="color:#75715e"># print(p7)</span>
+p<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>iroot(p7,<span style="color:#ae81ff">6</span>)[<span style="color:#ae81ff">0</span>]
+q<span style="color:#f92672">=</span>n3<span style="color:#f92672">//</span>(p<span style="color:#f92672">**</span><span style="color:#ae81ff">7</span>)
+<span style="color:#75715e"># print(q)</span>
+phi<span style="color:#f92672">=</span>p<span style="color:#f92672">**</span><span style="color:#ae81ff">6</span><span style="color:#f92672">*</span>(p<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)<span style="color:#f92672">*</span>(q<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)
+d<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>invert(e3,phi)
+m<span style="color:#f92672">=</span>gmpy2<span style="color:#f92672">.</span>powmod(c3,d,n3)
+print(long_to_bytes(m))
+</code></pre></div><p><code>b'qwb{8633ce6d-fece-4cf1-8f0f-f27e5bf6d678}’</code></p>
+
+    </div>
+    <div class="post-footer">
+      
+    </div>
+  </article>
+
+    </main>
+  </body>
+</html>
